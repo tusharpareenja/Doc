@@ -1,0 +1,94 @@
+# Dockerfile for Intel/AMD64 architecture
+FROM node:18-slim AS builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    python3 \
+    make \
+    g++ \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files and shrinkwrap files
+COPY server/package*.json ./server/
+COPY server/npm-shrinkwrap.json ./server/
+COPY server/Common/package*.json ./server/Common/
+COPY server/Common/npm-shrinkwrap.json ./server/Common/
+COPY server/DocService/package*.json ./server/DocService/
+COPY server/DocService/npm-shrinkwrap.json ./server/DocService/
+COPY server/FileConverter/package*.json ./server/FileConverter/
+COPY server/FileConverter/npm-shrinkwrap.json ./server/FileConverter/
+COPY server/Metrics/package*.json ./server/Metrics/
+COPY server/Metrics/npm-shrinkwrap.json ./server/Metrics/
+COPY server/SpellChecker/package*.json ./server/SpellChecker/
+COPY server/SpellChecker/npm-shrinkwrap.json ./server/SpellChecker/
+COPY server/AdminPanel/server/package*.json ./server/AdminPanel/server/
+COPY server/AdminPanel/client/package*.json ./server/AdminPanel/client/
+
+# Install Node.js dependencies
+# npm ci works with both package-lock.json and npm-shrinkwrap.json
+WORKDIR /app/server
+RUN npm ci
+
+# Install submodule dependencies
+RUN npm run install:Common && \
+    npm run install:DocService && \
+    npm run install:FileConverter && \
+    npm run install:Metrics
+
+# Copy all source files
+WORKDIR /app
+COPY . .
+
+# Build the server (if build tools are available)
+# Note: Core C++ components may need to be pre-built or built separately
+WORKDIR /app/server
+RUN npm run build || echo "Build step skipped - core may need separate compilation"
+
+# Runtime stage
+FROM node:18-slim
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    fonts-dejavu \
+    fonts-liberation \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create app directory
+WORKDIR /var/www/onlyoffice/documentserver
+
+# Copy built application from builder
+COPY --from=builder /app/server ./server
+COPY --from=builder /app/web-apps ./web-apps
+COPY --from=builder /app/sdkjs ./sdkjs
+COPY --from=builder /app/core-fonts ./core-fonts
+COPY --from=builder /app/dictionaries ./dictionaries
+
+# Create necessary directories
+RUN mkdir -p /var/log/onlyoffice/documentserver && \
+    mkdir -p /var/lib/onlyoffice/documentserver/App_Data && \
+    mkdir -p /etc/onlyoffice/documentserver
+
+# Copy configuration files (including log4js subdirectory)
+COPY --from=builder /app/server/Common/config/ /etc/onlyoffice/documentserver/
+
+# Set environment variables
+ENV NODE_ENV=production-linux
+ENV NODE_CONFIG_DIR=/etc/onlyoffice/documentserver
+
+# Expose ports (adjust based on your configuration)
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/healthcheck || exit 1
+
+# Start the service
+WORKDIR /var/www/onlyoffice/documentserver/server
+CMD ["node", "DocService/sources/server.js"]
+

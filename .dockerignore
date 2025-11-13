@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+!server/Readme.md
+CHANGELOG.md
+ROADMAP.md
+LICENSE.txt
+
+# Build artifacts
+build/
+build_tools/
+node_modules/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test files
+tests/
+*.test.js
+*.spec.js
+
+# Screenshots
+screenshots/
+
+# Temporary files
+*.tmp
+*.temp
+
