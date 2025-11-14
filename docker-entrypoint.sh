@@ -22,11 +22,12 @@ fi
 echo "{" > "$CONFIG_FILE"
 
 # RabbitMQ configuration
+RABBITMQ_URL="${RABBITMQ_URL:-${AMQP_URI}}"
 if [ -n "$RABBITMQ_URL" ]; then
     echo "Configuring RabbitMQ URL from environment variable: $RABBITMQ_URL"
     echo "  \"rabbitmq\": {" >> "$CONFIG_FILE"
     echo "    \"url\": \"$RABBITMQ_URL\"" >> "$CONFIG_FILE"
-    echo "  }" >> "$CONFIG_FILE"
+    echo "  }," >> "$CONFIG_FILE"
     HAS_CONFIG=true
 fi
 

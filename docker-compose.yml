@@ -30,8 +30,8 @@ services:
       POSTGRES_USER: onlyoffice
       POSTGRES_PASSWORD: onlyoffice
       POSTGRES_DB: onlyoffice
-    ports:
-      - "5432:5432"
+    # ports:
+    #   - "5433:5432"  # Only expose if you need external access
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U onlyoffice"]
       interval: 10s
@@ -47,8 +47,8 @@ services:
   redis:
     image: redis:7-alpine
     container_name: docserver-redis
-    ports:
-      - "6379:6379"
+    # ports:
+    #   - "6380:6379"  # Only expose if you need external access
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -76,13 +76,13 @@ services:
     environment:
       - NODE_ENV=production-linux
       - NODE_CONFIG_DIR=/etc/onlyoffice/documentserver
-      - AMQP_URI=amqp://guest:guest@rabbitmq:5672
-      - DB_HOST=postgres
+      - AMQP_URI=amqp://guest:guest@docserver-rabbitmq:5672
+      - DB_HOST=docserver-postgres
       - DB_PORT=5432
       - DB_NAME=onlyoffice
       - DB_USER=onlyoffice
       - DB_PASS=onlyoffice
-      - REDIS_HOST=redis
+      - REDIS_HOST=docserver-redis
       - REDIS_PORT=6379
     ports:
       - "8000:8000"
