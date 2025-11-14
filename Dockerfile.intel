@@ -69,6 +69,11 @@ COPY --from=builder /app/sdkjs ./sdkjs
 COPY --from=builder /app/core-fonts ./core-fonts
 COPY --from=builder /app/dictionaries ./dictionaries
 
+# Ensure requirejs is available in sdkjs/vendor for frontend editor index.html references
+RUN mkdir -p ./sdkjs/vendor/requirejs && \
+    cp ./web-apps/vendor/requirejs/require.js ./sdkjs/vendor/requirejs/require.js && \
+    cp ./web-apps/vendor/requirejs/require.min.js ./sdkjs/vendor/requirejs/require.min.js 2>/dev/null || true
+
 # Create necessary directories
 RUN mkdir -p /var/log/onlyoffice/documentserver && \
     mkdir -p /var/lib/onlyoffice/documentserver/App_Data && \
