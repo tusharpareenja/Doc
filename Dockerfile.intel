@@ -44,6 +44,11 @@ RUN npm run install:Common && \
 WORKDIR /app
 COPY . .
 
+# Build sdkjs develop files (required for frontend initialization)
+WORKDIR /app/sdkjs/build
+RUN npm ci 2>/dev/null || echo "Warning: npm ci in sdkjs/build failed"
+RUN npm run build 2>/dev/null || echo "Warning: npm run build in sdkjs/build failed"
+
 # Build the server (if build tools are available)
 # Note: Core C++ components may need to be pre-built or built separately
 WORKDIR /app/server
