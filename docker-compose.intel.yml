@@ -95,9 +95,8 @@ services:
     volumes:
       - docserver-data:/var/lib/onlyoffice/documentserver
       - docserver-logs:/var/log/onlyoffice/documentserver
-      # Mount web-apps and sdkjs from host for rapid frontend iteration
+      # Mount web-apps from host for rapid frontend iteration (but NOT sdkjs - that's built in image)
       - ./web-apps:/var/www/onlyoffice/documentserver/web-apps:ro
-      - ./sdkjs:/var/www/onlyoffice/documentserver/sdkjs:ro
     networks:
       - docserver-network
     restart: unless-stopped
