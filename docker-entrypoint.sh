@@ -22,13 +22,16 @@ fi
 echo "{" > "$CONFIG_FILE"
 
 # RabbitMQ configuration
+    
 RABBITMQ_URL="${RABBITMQ_URL:-${AMQP_URI}}"
+FIRST=true
+
 if [ -n "$RABBITMQ_URL" ]; then
     echo "Configuring RabbitMQ URL from environment variable: $RABBITMQ_URL"
     echo "  \"rabbitmq\": {" >> "$CONFIG_FILE"
     echo "    \"url\": \"$RABBITMQ_URL\"" >> "$CONFIG_FILE"
-    echo "  }," >> "$CONFIG_FILE"
-    HAS_CONFIG=true
+    echo "  }" >> "$CONFIG_FILE"
+    FIRST=false
 fi
 
 # Database configuration
@@ -36,10 +39,9 @@ if [ -n "$DB_HOST" ] || [ -n "$DB_PORT" ] || [ -n "$DB_NAME" ] || [ -n "$DB_USER
     echo "Configuring database from environment variables"
     echo "  DB_HOST=$DB_HOST, DB_PORT=$DB_PORT, DB_NAME=$DB_NAME, DB_USER=$DB_USER"
     
-    if [ "$HAS_CONFIG" = true ]; then
+    if [ "$FIRST" = false ]; then
         echo "," >> "$CONFIG_FILE"
     fi
-    
     DB_TYPE="${DB_TYPE:-postgres}"
     DB_HOST="${DB_HOST:-localhost}"
     DB_PORT="${DB_PORT:-5432}"
