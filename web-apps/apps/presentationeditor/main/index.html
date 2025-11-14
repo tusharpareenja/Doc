@@ -361,9 +361,13 @@
         }
     </script>
 
-    <!-- debug begin -->
-    <link rel="stylesheet/less" type="text/css" href="resources/less/app.less" />
+    <!-- debug begin (disabled for production deployment) -->
+    <!-- <link rel="stylesheet/less" type="text/css" href="resources/less/app.less" /> -->
     <!-- debug end -->
+    <!-- Production CSS placeholder - normally compiled from LESS during build -->
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+    </style>
     <script src="../../common/main/lib/util/themeinit.js"></script>
 </head>
 <body role="application">
@@ -483,9 +487,9 @@
         window.g_debug_mode = true;
     </script>
 
-    <!-- debug begin -->
-    <script type="text/javascript">var less=less||{};less.env='development';less.async=true;</script>
-    <script src="../../../vendor/less/dist/less.js" type="text/javascript"></script>
+    <!-- debug begin (disabled for production deployment) -->
+    <!-- <script type="text/javascript">var less=less||{};less.env='development';less.async=true;</script> -->
+    <!-- <script src="../../../vendor/less/dist/less.js" type="text/javascript"></script> -->
     <!-- debug end -->
 
     <script type="text/javascript" src="../../../../sdkjs/develop/sdkjs/slide/scripts.js"></script>
