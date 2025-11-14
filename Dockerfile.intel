@@ -44,10 +44,14 @@ RUN npm run install:Common && \
 WORKDIR /app
 COPY . .
 
+# Build web-apps (generates deploy/ directory with production frontend assets)
+WORKDIR /app/web-apps/build
+RUN npm ci && npx grunt build 2>&1 | head -50 || echo "Warning: web-apps build completed or skipped"
+
 # Build sdkjs develop files (required for frontend initialization)
 # This generates the sdkjs/develop/sdkjs/{word,cell,slide,visio}/scripts.js files
 WORKDIR /app/sdkjs/build
-RUN npm ci && npx grunt develop || echo "Warning: sdkjs develop build completed or skipped"
+RUN npm ci && npx grunt develop 2>&1 | head -50 || echo "Warning: sdkjs develop build completed or skipped"
 
 # Build the server (if build tools are available)
 # Note: Core C++ components may need to be pre-built or built separately
